@@ -1,0 +1,151 @@
+\documentclass[12pt,a4paper]{article}
+
+% ------------------ Basic setup ------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+% Header & footer
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+\usepackage{lastpage}    
+
+\newcommand{\studentname}{Zhidong Zhang}
+\newcommand{\course}{Neural Modeling}
+\newcommand{\assignmentnumber}{Homework 4}
+\newcommand{\assignmentdate}{\today}
+\renewcommand{\figurename}{Fig.}
+
+% ------------------ Header configuration ------------------
+\lhead{\studentname}
+\chead{\course\ -\ \assignmentnumber}
+\rhead{\assignmentdate}
+% \cfoot{\thepage}
+\cfoot{\thepage\ / \pageref{LastPage}}  % i/n的页数形式
+\rfoot{}
+
+% ------------------ Typography ------------------
+\usepackage{setspace}
+\setstretch{1.3}  % line spacing
+
+% ------------------ Math packages ------------------
+\usepackage{amsmath, amssymb}
+
+\renewcommand{\thesubsection}{\Alph{subsection}}
+
+% ------------------ Document ------------------
+\begin{document}
+
+% \section{Online Course}
+\section{Online course}
+
+The summary of the online course is attached to the end of this report.
+
+\section{Exercises}
+
+\subsection{Cone Sensitivity}
+
+To fascilitate the following calculations, interpolation is performed on the cone sensitivity data to obtain values per 0.5 nm. It is done by using the \texttt{interp1d} function from the \texttt{scipy.interpolate} module in Python with the \texttt{cubic} method, to make smooth curves.
+
+The cone sensitivity $f_{a}(\lambda)$ for each type of cone $a \in \{L, M, S\}$ is shown in Fig.~\ref{fig:cone_sensitivity}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/Cone_Sensitivity_Spectrum.pdf}
+    \caption{Cone sensitivity spectrum $f_a(\lambda)$ for each type of cone $a \in \{L, M, S\}$.}
+    \label{fig:cone_sensitivity} 
+\end{figure}
+
+
+\subsection{Likelihoods on a given input}
+
+Given a input $\mathbf{S}(\lambda, I)$ with $I=100$ and $\lambda = 570$ nm, the likelihood $P(r_a|\mathbf{S}(\lambda, I))$ and the mean cone absorption rate $\overline{r} = If_a(\lambda)$ for each type of cone $a \in \{L, M, S\}$ is shown in Fig.~\ref{fig:likelihood_570nm_100I}.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/Poisson_Distribution_At_570nm_100I.pdf}
+    \caption{Likelihood $P(r_a|\mathbf{S}(\lambda, I))$ at $\lambda = 570$ nm and $I=100$ for each type of cone $a \in \{L, M, S\}$. The dashed lines indicate the average absorption rates $\overline{r}$.}
+    \label{fig:likelihood_570nm_100I} 
+\end{figure}
+
+\subsection{Samples and 3D Visualization}
+
+Here 500 samples are drawn from the Poisson distributions $P(r_a|\mathbf{S}(\lambda, I))$ at $\lambda = 570$ nm and $I=100$ for each type of cone $a \in \{L, M, S\}$. The 3D scatter plot of the samples is shown in Fig.~\ref{fig:3d_scatter_samples}.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/Scatter_3dSpace.pdf}
+    \caption{3D scatter plot of 1000 samples drawn from the Poisson distributions $P(r_a|\mathbf{S}(\lambda, I))$ at $\lambda = 570$ nm and $I=100$ for each type of cone $a \in \{L, M, S\}$.}
+    \label{fig:3d_scatter_samples} 
+\end{figure}
+
+
+\subsection{Another input with different wavelength}
+
+Set another input $\mathbf{S}'(\lambda', I)$ with $\lambda' = \lambda + d\lambda$, where different values of $d\lambda$ are tried to find the approximate value that makes the samples drawn from $P(r_a|\mathbf{S}(\lambda, I))$ and $P(r_a|\mathbf{S}'(\lambda', I))$ have about 30\% overlap and 5\% overlap in the 3D space.
+
+After several trials, it is estimated (by naked eyes) that $d\lambda \approx 8$ nm gives about 30\% overlap and $d\lambda \approx 12$ nm gives about 5\% overlap. As is shown in Fig.~\ref{fig:scatter_overlap}.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.49\textwidth]{figures/Scatter_3dSpace_overlap_30.pdf}
+    \includegraphics[width=0.49\textwidth]{figures/Scatter_3dSpace_overlap_5.pdf}
+    \caption{3D scatter plot of samples drawn from the Poisson distributions $P(r_a|\mathbf{S}(\lambda, I))$ at $\lambda = 570$ nm (blue) and $P(r_a|\mathbf{S}'(\lambda', I))$ at $\lambda' = \lambda + d\lambda$ (red) for each type of cone $a \in \{L, M, S\}$. Left: $d\lambda \approx 8$ nm for about 30\% overlaps. Right: $d\lambda \approx 12$ nm for about 5\% overlaps.}
+    \label{fig:scatter_overlap} 
+\end{figure}
+
+
+\subsection{Decoding the wavelength from a single sample}
+
+Using the samples drawn from $P(r_a|\mathbf{S}(\lambda, I))$ at $\lambda = 570$ nm and $I=100$, the log-likelihood $\log P(r_S, r_M, r_L |  \mathbf{S}=(\hat{\lambda},I))$ is computed for $\hat{\lambda}$ ranging from 400 nm to 700 nm. Here log-likelihood is used instead of likelihood to avoid numerical underflow issues, resulting from multiplying small probabilities.  The value of $\hat{\lambda}$ that maximizes the log-likelihood is taken as the estimated wavelength.
+
+The plot of the log-likelihood, with the estimated $\hat{\lambda}$ that maximizes it, is shown in Fig.~\ref{fig:log_likelihood}. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.65\textwidth]{figures/log-likelihood.pdf}
+    \caption{Log-likelihood $\log P(r_S, r_M, r_L |  \mathbf{S}=(\hat{\lambda},I))$ computed from a single sample drawn from $P(r_a|\mathbf{S}(\lambda, I))$ at $\lambda = 570$ nm and $I=100$, as a function of $\hat{\lambda}$. The red dashed line indicates the true wavelength $\lambda = 570$ nm, and the green dotted line indicates the estimated wavelength $\hat{\lambda}$ that maximizes the log-likelihood.}
+    \label{fig:log_likelihood} 
+\end{figure}
+
+Then the decoding error for this single sample can be calculated as $\delta\lambda = \hat{\lambda} - \lambda = 572.5-570=2.5$ nm.
+
+
+\subsection{Histogram of Decoding Errors}
+
+Using multiple samples drawn before, the decoding error $\delta\lambda = \hat{\lambda} - \lambda$ is computed for each sample. The histogram of these decoding errors is shown in Fig.~\ref{fig:histogram_decoding_error}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/histogram_decoding_error.pdf}
+    \caption{Histogram of decoding errors $\delta\lambda = \hat{\lambda} - \lambda$ computed from multiple samples drawn from $P(r_a|\mathbf{S}(\lambda, I))$ at $\lambda = 570$ nm and $I=100$.}
+    \label{fig:histogram_decoding_error} 
+\end{figure}
+
+It can be seen that most of the decoding errors fall in the range of $|\delta \lambda|<10$ nm, so the width of the histogram is about 10 nm, smilar to the $d\lambda = 12$ nm that gives about 5\% overlap in the previous subsection.
+
+\clearpage
+\subsection{Decoding errors for a different input wavelength}
+
+Using another input $\mathbf{S}(\lambda, I)$ with $\lambda = 450$ nm and $I=100$, the same procedure is performed to compute the decoding errors $\delta\lambda = \hat{\lambda} - \lambda$ for multiple samples drawn from $P(r_a|\mathbf{S}(\lambda, I))$. The histogram of these decoding errors is shown in Fig.~\ref{fig:histogram_decoding_error_prime}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/histogram_decoding_error_prime.pdf}
+    \caption{Histogram of decoding errors $\delta\lambda = \hat{\lambda} - \lambda$ computed from multiple samples drawn from $P(r_a|\mathbf{S}(\lambda, I))$ at $\lambda = 450$ nm and $I=100$.}
+    \label{fig:histogram_decoding_error_prime} 
+\end{figure}
+
+
+Also, it is estimated (by naked eyes) that $d\lambda \approx 13$ nm gives about 30\% overlap and $d\lambda \approx 18$ nm gives about 5\% overlap. As is shown in Fig.~\ref{fig:scatter_overlap}.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.49\textwidth]{figures/Scatter_3dSpace_overlap_30_prime.pdf}
+    \includegraphics[width=0.49\textwidth]{figures/Scatter_3dSpace_overlap_5_prime.pdf}
+    \caption{3D scatter plot of samples drawn from the Poisson distributions $P(r_a|\mathbf{S}(\lambda, I))$ at $\lambda = 450$ nm (blue) and $P(r_a|\mathbf{S}'(\lambda', I))$ at $\lambda' = \lambda + d\lambda$ (red) for each type of cone $a \in \{L, M, S\}$. Left: $d\lambda \approx 13$ nm for about 30\% overlaps. Right: $d\lambda \approx 18$ nm for about 5\% overlaps.}
+    \label{fig:scatter_overlap_prime} 
+\end{figure}
+
+It can be seen that most of the decoding errors fall in the range of $|\delta \lambda|<19$ nm, so the width of the histogram is about 19 nm, smilar to the $d\lambda = 18$ nm that gives about 5\% overlap in the previous subsection.
+
+\end{document}

@@ -1,0 +1,125 @@
+\documentclass[12pt,a4paper]{article}
+
+% ------------------ Basic setup ------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\usepackage{enumitem}
+% Header & footer
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+\usepackage{lastpage}    
+
+\newcommand{\studentname}{Zhidong Zhang}
+\newcommand{\course}{Neural Modeling}
+\newcommand{\assignmentnumber}{Homework 3}
+\newcommand{\assignmentdate}{\today}
+\renewcommand{\figurename}{Fig.}
+
+% ------------------ Header configuration ------------------
+\lhead{\studentname}
+\chead{\course\ -\ \assignmentnumber}
+\rhead{\assignmentdate}
+% \cfoot{\thepage}
+\cfoot{\thepage\ / \pageref{LastPage}}  % i/n的页数形式
+\rfoot{}
+
+% ------------------ Typography ------------------
+\usepackage{setspace}
+\setstretch{1.3}  % line spacing
+
+% ------------------ Math packages ------------------
+\usepackage{amsmath, amssymb}
+
+\renewcommand{\thesubsubsection}{\Alph{subsubsection}}
+
+% ------------------ Document ------------------
+\begin{document}
+
+% \section{Online Course}
+\section{Online course}
+
+The summary of the online course is attached to the end of this report.
+
+\section{Exercises}
+
+\subsection{Practice exercises for consolidation of the learning on the V1 mechanisms for visual saliency.}
+
+\begin{enumerate}[label=(\Alph*)]
+    \item $O_C = O_B$
+    \item $C_C > C_B$
+    \item $CO_C > CO_B$
+    \item $\text{SMAP}_C = \max(C_C,O_C,CO_C)=\max(C_C,CO_C)$
+    \item $O_O>O_B, C_O=C_B, CO_O>CO_B$
+    \item $\text{SMAP}_O = \max(C_O,O_O,CO_O) = \max(O_O,CO_O)$
+    \item $O_C<O_{CO}=O_O$, \\ $C_C=C_{CO}>C_O$, \\ $CO_{CO} \ge  CO_O, CO_{CO}\ge CO_C$
+    \item $\text{SMAP}_{CO} = \max(C_C,O_O,CO_{CO}) = \max(\text{SMAP}_C, \text{SMAP}_O, CO_{CO})$
+    \item $\text{RT}_{CO} \le \min(\text{RT}_C,\text{RT}_O)$
+
+\end{enumerate}
+
+\subsection{Probability and cumulative distribution of $RT_C$, $RT_O$ and $RT_{CO}$}
+
+The probability density of $RT_C$, $RT_O$ and $RT_{CO}$ are shown in Fig.~\ref{fig:prob_his}, and the cumulative distribution are shown in Fig.~\ref{fig:cumulative_prob}. It can be seen that the distribution of three of them are clearly different from each other, where $RT_{CO}$ concentrated at lower values than the other two. It can roughly be inferred that $RT_{CO}$ is smaller than both $RT_C$ and $RT_O$, while $RT_O$ is smaller than $RT_C$.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.49\textwidth]{figures/RT_C_prob_density.pdf}
+    \includegraphics[width=0.49\textwidth]{figures/RT_O_prob_density.pdf}
+    \includegraphics[width=0.49\textwidth]{figures/RT_CO_prob_density.pdf}
+    \includegraphics[width=0.49\textwidth]{figures/Probability_density_histogram}
+    \caption{Probability density of $RT_C$, $RT_O$ and $RT_{CO}$}
+    \label{fig:prob_his} 
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/Cumulative_distributions.pdf}
+    \caption{Cumulative distribution of $RT_C$, $RT_O$ and $RT_{CO}$}
+    \label{fig:cumulative_prob} 
+\end{figure}
+
+\clearpage
+
+\subsection{Race model}
+
+Use Monte Carlo simulation to generate the distribution of $RT_{CO}^{race}$, which is the minimum of randomly sampled $RT_C$ and $RT_O$ and repeated for 10000 times. The probability density and cumulative distribution of $RT_{CO}^{race}$ and $RT_{CO}$ are shown in Fig.~\ref{fig:prob_cumulative_race}. The distribution of $RT_{CO}^{race}$ is slightly different from that of $RT_{CO}$, where $RT_{CO}$ is more concentrated at lower values and their cumulative distribution nearly overlap when $RT>0.9$. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/Probability_density_race.pdf}
+    \includegraphics[width=0.6\textwidth]{figures/Cumulative_distributions_race.pdf}
+    \caption{Probability density Cumulative distribution of $RT_{CO}^{race}$ and $RT_{CO}$}
+    \label{fig:prob_cumulative_race} 
+\end{figure}
+
+To further compare the two distributions, the mean, standard deviation and median of $RT_{CO}^{race}$ and $RT_{CO}$ are calculated and shown in the table below. It shows that the mean and median of $RT_{CO}$ is smaller than that of $RT_{CO}^{race}$, indicating that the actual reaction time when both features are present is faster than the prediction by the race model.
+
+\begin{table}
+    \centering
+    \begin{tabular}{lcccc}
+        \hline
+         & Mean & SEM & Median \\
+        \hline
+        $RT_{CO}$ & 0.659 & 0.015 & 0.590 \\
+        $RT_{CO}^{race}$ & 0.714 & 0.002 & 0.670 \\
+        \hline
+    \end{tabular}
+    \quad
+\end{table}
+
+A scatter plot and a violin plot are generated in Fig.~\ref{fig:scatter_violin_plot} to visualize the comparison. T-test is also performed to get $p=0.000282<0.05$, indicating that the two distributions are significantly different, with $RT_{CO}$ being smaller than $RT_{CO}^{race}$.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{figures/scatter_errorbars.pdf}
+    \includegraphics[width=0.45\textwidth]{figures/violin_plot.pdf}
+    \caption{scatter plot and violin plot of $RT_{CO}^{race}$ and $RT_{CO}$}
+    \label{fig:scatter_violin_plot} 
+\end{figure}
+
+\end{document}

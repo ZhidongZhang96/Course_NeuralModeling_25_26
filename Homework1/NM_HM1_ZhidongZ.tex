@@ -1,0 +1,235 @@
+\documentclass[12pt,a4paper]{article}
+
+% ------------------ Basic setup ------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+% Header & footer
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+\usepackage{lastpage}    
+
+\newcommand{\studentname}{Zhidong Zhang}
+\newcommand{\course}{Neural Modeling}
+\newcommand{\assignmentnumber}{Homework 1}
+\newcommand{\assignmentdate}{\today}
+\renewcommand{\figurename}{Fig.}
+
+% ------------------ Header configuration ------------------
+\lhead{\studentname}
+\chead{\course\ -\ \assignmentnumber}
+\rhead{\assignmentdate}
+% \cfoot{\thepage}
+\cfoot{\thepage\ / \pageref{LastPage}}  % i/n的页数形式
+\rfoot{}
+
+% ------------------ Typography ------------------
+\usepackage{setspace}
+\setstretch{1.3}  % line spacing
+
+% ------------------ Math packages ------------------
+\usepackage{amsmath, amssymb}
+
+\renewcommand{\thesubsection}{\Alph{subsection}}
+
+% ------------------ Document ------------------
+\begin{document}
+
+% \section{Online Course}
+\section{Online course}
+
+The summary of the online course is attached to the end of this report.
+
+\section{Exercises}
+\subsection{Choose a photo}
+The original photo and its gray-scaled are as followed:
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.3\textwidth]{figures/example.jpg}
+    \includegraphics[width=0.3\textwidth]{figures/example_luminance.jpg}
+    \caption{Original photo (left) and its grayscale version (right).}
+    \label{fig:photo} 
+\end{figure}
+
+\subsection{Filter the photo with toy center-surround models}
+
+With $L\in \{10, 50,100\}$ and $v\in \{1,5,10\}$, toy models were built as center-surround receptive fields and used to filter the grayscale photo. 
+
+According to the responses map shown in Fig.~\ref{fig:response_toy_model}, as $L$ and $v$ get larger, boundaries between different regions have become slurred and smoother. A small receptive field size $L$ can benefit seeing precisely, as more fields are used to respond to the photo in more detail. Also, a larger $v$ enhances the effect of the `off-region' of the receptive field, causes the response at a certain location to be more affected by the surrounding area, resulting in the boundary shapes of these areas becoming smoother.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/response_map_L_v.pdf}
+    \caption{Response maps of different parameters $L$ and $v$}
+    \label{fig:response_toy_model}
+\end{figure}
+
+\subsection{Difference-of-gaussian filter}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.35\textwidth]{figures/DoG_kernel_wc11ws10sc1ss5.pdf}\\
+    \includegraphics[width=0.35\textwidth]{figures/DoG_kernel_wc11ws30sc1ss5.pdf}
+    \includegraphics[width=0.35\textwidth]{figures/DoG_kernel_wc30ws10sc1ss5.pdf}
+    \includegraphics[width=0.35\textwidth]{figures/DoG_kernel_wc11ws10sc3ss5.pdf}
+    \includegraphics[width=0.35\textwidth]{figures/DoG_kernel_wc11ws10sc1ss10.pdf}
+    \caption{Receptive field of DoG models with different parameters (Top: selected parameters, Middle: varied $w_c$ and $w_s$, Bottom: varied $\sigma_c$ and $\sigma_s$) }
+    \label{fig:DoG_kernels}
+\end{figure}
+
+Set $w_c=11,w_s=10,\sigma_c=1,\sigma_s=5$ as the selected parameters to build a DoG model, with kernel size $L=6\max\{w_c,w_s\}$. Then change them one by one to see how each parameter affects the kernel and response map. The receptive fields of these DoG models are shown in Fig.~\ref{fig:DoG_kernels}.
+
+As we can see from the figure, changing the parameters alters the shape and size of the receptive fields. For instance, increasing $w_s$ or $w_c$ while keeping other parameters constant, results in larger areas of on-region or off-region respectively. Similarly, increasing $\sigma_c$ or $\sigma_s$ leads to a broader spread of the respective regions with lower values. 
+
+Thus, $w_s$ and $w_c$ control the size of the receptive field's on and off regions, while $\sigma_c$ and $\sigma_s$ influence the spread and intensity distribution within those regions.
+
+Then use the seleted DoG model to filter the grayscale photo, and the outcome is shown in Fig.~\ref{fig:response_DoG}, which contains more details and sharp boundaries, much better than the toy model's results.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.43\textwidth]{figures/DoG_response_map_wc11ws10sc1ss5.pdf}
+    \caption{Outcome of the selected DoG model}
+    \label{fig:response_DoG}
+\end{figure}
+\clearpage
+
+\subsection{V1's simple cell model (tuned to vertical orientation)}
+
+A vertical orientation selective neuron of V1 can be modeled by Gabor filter. Set $\sigma_x=1, \sigma_y=1.5, \hat{k}=2\pi/3, \phi=0$ as the selected parameters to build a Gabor filter, with kernel size $L=6\max\{w_c,w_s\}$. Then change them one by one to play with these parameters. The receptive fields of these Gabor filters are shown in Fig.~\ref{fig:V1_vertical_kernels}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.35\textwidth]{figures/V1_kernel_sx1_sy1.5_khat2.094_phi0.000.pdf}\\
+    \includegraphics[width=0.35\textwidth]{figures/V1_kernel_sx5_sy1.5_khat2.094_phi0.000.pdf}
+    \includegraphics[width=0.35\textwidth]{figures/V1_kernel_sx1_sy5_khat2.094_phi0.000.pdf}
+    \includegraphics[width=0.35\textwidth]{figures/V1_kernel_sx1_sy1.5_khat3.142_phi0.000.pdf}
+    \includegraphics[width=0.35\textwidth]{figures/V1_kernel_sx1_sy1.5_khat2.094_phi1.571.pdf}
+    \caption{Receptive field of V1 models with different parameters. (Top: selected parameters, Middle: varied $\sigma_x$ and $\sigma_y$, Bottom: varied $\hat{k}$ and $\phi$) }
+    \label{fig:V1_vertical_kernels}
+\end{figure}
+
+When $\sigma_x$ or $\sigma_y$ increases, the receptive field becomes wider horizontally or vertically, respectively. Then we can learn that $\sigma$ control the size of the gaussian function, which determines the area of the receptive field. A larger $\sigma$ means a larger receptive field, leading to a broader area of influence.
+
+When $\hat k$ get larger (but not more then $\pi$), the preferred frequency of the filter increases, making the receptive field contain more part of one cycle of the sinusoidal function. It will result in lower response in flat regions and higher response at boundaries.
+
+When $\phi$ changes from $0$ to $\pi/2$, the receptive field shifts from being cosine-modulated to sine-modulated. This phase shift alters the alignment of the receptive field with respect to the visual stimulus. When $\phi=\pi/2$, the receptive field prefers vertical edges.
+
+Then use the selected V1 model to filter the grayscale photo, and the outcome is shown in Fig.~\ref{fig:response_V1}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.43\textwidth]{figures/V1_response_map_sx1sy1.5khat2.094phi0.000.pdf}
+    % \includegraphics[width=0.43\textwidth]{figures/V1_response_map_sx1sy1.5khat2.094phi1.571.pdf}
+    \caption{Outcome of the selected V1 model (vertical)}
+    \label{fig:response_V1}
+\end{figure}
+
+\subsection{V1's simple cell model (tuned to horizontal orientation)}
+
+% A horizontal orientation selective neuron of V1 can also be modeled by Gabor filter, where the cosine function is aligned with the horizontal axis. 
+
+Set $\sigma_x=1.5, \sigma_y=1, \hat{k}=2\pi/3, \phi=\pi/2$ as the selected parameters to build the filter. Plot the receptives fields of filters tuned with horizontal and vertical orientations with the same parameters in Fig.~\ref{fig:V1_kernels_comparison}. It clearly show that they focus on different orientations.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.35\textwidth]{figures/V1_kernel_horizontal_sx1.5_sy1_khat2.094_phi0.000.pdf}   \includegraphics[width=0.35\textwidth]{figures/V1_kernel_sx1_sy1.5_khat2.094_phi0.000.pdf} 
+    \caption{Receptive fields of V1 models tuned to horizontal (left) and vertical (right) orientations with the same parameters.}
+    \label{fig:V1_kernels_comparison}
+\end{figure}
+
+Then use this horizontal orientation selective V1 model to filter the grayscale photo, and compare the outcome with the vertical model in Fig.~\ref{fig:response_V1_comparison}. With the similar parameters, the responses of these two models do not show much difference. It may because the photo does not contain strong orientation features, making both models respond similarly.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.43\textwidth]{figures/V1_response_map_horizontal_sx1.5sy1khat2.094phi0.000.pdf}
+    \includegraphics[width=0.43\textwidth]{figures/V1_response_map_sx1sy1.5khat2.094phi0.000.pdf}
+    % \includegraphics[width=0.43\textwidth]{figures/V1_response_map_horizontal_sx1sy1.5khat2.094phi0.000.pdf}
+    \caption{Outcomes of the selected V1 model tuned to horizontal (left) and vertical (right) orientations.}
+    \label{fig:response_V1_comparison}
+\end{figure}
+
+Therefore, a picture of baboon with strong orientation features is used to further compare these two models, as shown in Fig.~\ref{fig:response_V1_comparison_baboon}. The horizontal model responds strongly to the vertical edges features of the baboon, while would blur the horizontal features. The vertical model is just the opposite.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.43\textwidth]{figures/V1_response_map_horizontal_ssx1.5sy1khat2.094phi0.000_baboon.pdf}
+    \includegraphics[width=0.43\textwidth]{figures/V1_response_map_sx1sy1.5khat2.094phi0.000_baboon.pdf}
+    % \includegraphics[width=0.43\textwidth]{figures/V1_response_map_horizontal_sx1sy1.5khat2.094phi0.000.pdf}
+    \caption{Outcomes of the selected V1 model tuned to horizontal (left) and vertical (right) orientations, to a picture of baboon.}
+    \label{fig:response_V1_comparison_baboon}
+\end{figure}
+
+Also compare the outcomes of these two models when $\phi=\pi/2$. In this case, the models will only focus on edges. As is shown in Fig.~\ref{fig:response_V1_comparison_edges}, the horizontal model responds strongly to `vertical' edges, while the vertical model responds to `horizontal' edges, which is worth noticing.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.4\textwidth]{figures/V1_response_map_horizontal_sx1.5sy1khat2.094phi1.571.pdf}
+    \includegraphics[width=0.4\textwidth]{figures/V1_response_map_sx1sy1.5khat2.094phi1.571.pdf}
+    \caption{Outcomes of the selected V1 model tuned to horizontal (left) and vertical (right) orientations (with $\phi=\pi/2$).}
+    \label{fig:response_V1_comparison_edges}
+\end{figure}
+    
+
+\subsection{Contrast sensitivity function of DoG receptive field}
+
+Using the DoG model with $w_c=11,w_s=10,\sigma_c=1,\sigma_s=5$ to calculate the contrast sensitivity function, response of the model as a function of the spatial frequency $k$. It is shown in Fig.~\ref{fig:CSF_DoG}, with a peak at $k=0.52$. Here the kernel size $L$ is modified to get more $k$ points, but will not affect the CSF result, as it won't change the structure of the receptive field.
+
+\begin{figure}[h]
+    \centering
+    % \includegraphics[width=0.6\textwidth]{figures/DoG_CSF_wc11_ws10_sc1_ss5.pdf}
+    \includegraphics[width=0.6\textwidth]{figures/DoG_CSF_noextensions_wc11_ws10_sc1_ss5.pdf}
+    \caption{Contrast Sensitivity Function of DoG Receptive Field }
+    \label{fig:CSF_DoG}
+\end{figure}
+    
+
+\subsection{Contrast sensitivity function of V1 receptive field}
+
+Using the V1 model with $\sigma_x=1, \sigma_y=1.5, \hat{k}=2\pi/3, \phi=0$ to calculate the contrast sensitivity function, as shown in Fig.~\ref{fig:CSF_V1} (top) with a peak at $k_p\approx 1.86$($\ne \hat{k}\approx 2.09$). The value of $L$ is also modified here to get more $k$ points, but will not affect the CSF result. 
+
+Here change parameters $\sigma$ ($\sigma_x=2$, $\sigma_y=3$) and calculate the contrast sensitivity function, as shon in Fig.~\ref{fig:CSF_V1} (bottom) with a peak ar $k_p\approx 2.09=\hat{k}$. The reason why the CSF has a peak at $\hat{k}$ is simply that it is the frequency of the Gabor filter itself.
+
+% However, similar to the DoG model, the CSF result seems a bit odd, as it show 0 response from time to time. The result without extensions shown in Fig.~\ref{fig:CSF_V1}(right) does not have this problem. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/V1_CSF_sx1_sy1.5_khat2.094_phi0.000.pdf}
+    \includegraphics[width=0.6\textwidth]{figures/V1_CSF_sx2_sy3_khat2.094_phi0.000.pdf}
+    \caption{Contrast Sensitivity Function of V1 Receptive Field (Top: $\sigma_x=1, \sigma_y=1.5, \hat{k}=2\pi/3, \phi=0$; Bottom: $\sigma_x=2, \sigma_y=3, \hat{k}=2\pi/3, \phi=0$)}
+    \label{fig:CSF_V1}
+\end{figure}
+
+But for Fig.~\ref{fig:CSF_V1} (top), why it has $k_p\ne \hat{k}$? Here calculate the CSF under different values of $\sigma_x$, while $\sigma_y=1.5$, just to play around. As shown in Fig.~\ref{fig:CSF_V1_different_sigma_x}, when $\sigma_x$ get larger, the $k_p$ where CSF has a peak get closer to $\hat{k}$. The reason behind this phenomenon may be that a larger $\sigma_x$ makes the receptive field cover more cycles of the sinusoidal function along the x-axis, thus making the filter more frequency-selective and aligning its peak sensitivity closer to its inherent frequency $\hat{k}$.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/V1_CSF_different_sigma_x.pdf}
+    \caption{CSF under different $\sigma_x$}
+    \label{fig:CSF_V1_different_sigma_x}
+\end{figure}
+
+Compared to the DoG model, the V1 model shows a higher peak frequency and a sharper decline in sensitivity at higher frequencies. Also, V1 model shows a stronger preference for high-frequency components than the DoG model, which may reflect the more complex processing capabilities of V1 neurons compared to the simpler center-surround structure of DoG receptive fields.
+
+\subsection{Power spectrum of photos}
+
+Replace the kernel by photos, extend them according to the method provided in the instruction, and calculate the power spectrum ($|S_K^2|$ as a function of $|k|$) of each photo. Then average the results of seven photos and plot them together with $1/|k|^2$ for comparison, as shown in Fig.~\ref{fig:CSF_Signal}.
+
+Here I collect seven photos with size $256\times 256$ pixels as the input signals. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/Signal_CSF_average.pdf}
+    \caption{Power $|S_K|^2$ versus $|k|$ for input $S(x,y)$(Green line: the average of $|S_K|^2$ over seven photos; Red line: $1/{|k|^2}$)}
+    \label{fig:CSF_Signal}
+\end{figure}
+
+The average power spectrum of the seven photos exhibits a trend that is similar to the $1/|k|^2$ line, i.e. $\langle|S_K|^2 \rangle \propto 1/|k|^2$. This suggests that the power spectrum of natural images tends to follow a $1/|k|^2$ distribution, indicating that lower spatial frequencies (smaller $|k|$ values) generally contain more power compared to higher spatial frequencies.
+
+
+
+\end{document}

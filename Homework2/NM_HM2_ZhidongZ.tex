@@ -1,0 +1,530 @@
+\documentclass[12pt,a4paper]{article}
+
+% ------------------ Basic setup ------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+% Header & footer
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+\usepackage{lastpage}    
+
+\newcommand{\studentname}{Zhidong Zhang}
+\newcommand{\course}{Neural Modeling}
+\newcommand{\assignmentnumber}{Homework 2}
+\newcommand{\assignmentdate}{\today}
+\renewcommand{\figurename}{Fig.}
+
+% ------------------ Header configuration ------------------
+\lhead{\studentname}
+\chead{\course\ -\ \assignmentnumber}
+\rhead{\assignmentdate}
+% \cfoot{\thepage}
+\cfoot{\thepage\ / \pageref{LastPage}}  % i/n的页数形式
+\rfoot{}
+
+% ------------------ Typography ------------------
+\usepackage{setspace}
+\setstretch{1.3}  % line spacing
+
+% ------------------ Math packages ------------------
+\usepackage{amsmath, amssymb}
+
+\renewcommand{\thesubsubsection}{\Alph{subsubsection}}
+
+% ------------------ Document ------------------
+\begin{document}
+
+% \section{Online Course}
+\section{Online course}
+
+The summary of the online course is attached to the end of this report.
+
+\section{Exercises}
+
+\subsection{Part 1: Introductory math for computational vision and initial steps of efﬁcient coding}
+
+\subsubsection{Choose a pair of stereo images}
+
+Here I selected two photos shown in Fig.~\ref{fig:photos} where I cut down the size of the original images to $200 \times 200$ pixels from $1000 \times 1000$ for easier computation and visualization. The luminance channel of the images is also shown for reference, where the pixel values are mapped to the grayscale intensity among $[0, 255]$.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.3\textwidth]{figures/Vue5L.jpg}\ 
+    \includegraphics[width=0.3\textwidth]{figures/Vue5R.jpg}\\
+    \includegraphics[width=0.7\textwidth]{figures/images_luminance.png}
+    \caption{Selected photos (Top: the original images; Bottom: luminance channel of the image).}
+    \label{fig:photos} 
+\end{figure}
+
+\subsubsection{Normalize and calculate the probability $P(S)$}
+
+The probability density distributions of both $P(S_L)$ and $P(S_R)$ are shown in Fig.~\ref{fig:probability}. The two pictures are quite similar as there is only slight difference between two distributions.
+
+\begin{figure}[h]
+    \centering
+    % \includegraphics[width=0.5\textwidth]{figures/prob_L_R.png}\\
+    \includegraphics[width=0.6\textwidth]{figures/prob_LR.pdf}
+    \caption{Probability density distributions of $P(S_L)$ and $P(S_R)$.}
+    \label{fig:probability} 
+\end{figure}
+
+\subsubsection{Pixel entropy, joint probability, joint entropy, mutual information, and redundancy}
+
+The pixel entropies of the two images are computed as:
+
+$$H(S_1) = 7.4300\text{ bits}, H(S_2) = 7.4194 \text{ bits}$$
+
+Then the joint probability distribution is computed as shown in Fig.~\ref{fig:joint_probability}.
+\begin{figure}[h]
+    \centering
+    % \includegraphics[width=0.5\textwidth]{figures/prob_L_R.png}\\
+    \includegraphics[width=0.6\textwidth]{figures/joint_prob_LR.pdf}
+    \caption{Joint probability distribution $P(S_L, S_R)$.}
+    \label{fig:joint_probability} 
+\end{figure}
+
+The joint entropy and mutual information are computed as:
+
+$$H(S_1,S_2) = 13.5912 \text{bits}$$
+$$I(S_1; S_2) = 1.2582 \text{bits}$$
+
+The mutual information computed here refers to the mutual information between the two images \textit{per pixels}, but not the whole images, which is interesting to note and may result in the respective small value.
+
+Here the redundancy is computed as:
+$$R(S_1; S_2) = 0.0926 = 9.26\%$$
+
+\subsubsection{Different $n$}
+
+Here different $n$ values ($n=1,2,3,...,8$) are tested for scaling the images. The results are shown in Fig.~\ref{fig:diffferent_n} and Fig.~\ref{fig:diffferent_n_redundancy}. 
+
+As shown in Fig.~\ref{fig:diffferent_n}, with the increase of $n$, the entropies all increase, which is reasonable as larger $n$ means more possible pixel values, thus more uncertainty and more information. One interesting observation is that the mutual information increases with $n$ more slightly respectively, and it remains a low value commpared to the entropies. It indicates that even with larger $n$, the two images still share limited information per pixel.
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/entropy_mutual_info_vs_n.pdf}
+    \caption{Entropy, Joint Entropy, and Mutual Information vs $n$.}
+    \label{fig:diffferent_n} 
+\end{figure}
+
+
+According to Fig.~\ref{fig:diffferent_n_redundancy}, the redundancy rates show a `U' curve with the increase of $n$. It first shows a significantly low value at $n=1$, which may because the information is abstracted too much at this stage and the selected image collapse into mostly one value, leading to very small entropy and further less shared information between the two images than the joint information. Then it decreases progressively from $n=2$ to $n=6$, as the pixel values become more precise and contain more detialed difference pixels-wise, as expected. 
+
+After that it increases to $n=8$, which is quite interesting. It may because the image size doesn't support sampling with larger $n$ values. Given the definition that $R(S_1,S_2)=[H(S_1)+H(S_2)]/H(S_1,S_2)-1$, where $H(S_i) = -\sum_{S_i}P(S_i)\log P(S_i)$ and $H(S_1,S_2) = -\sum_{S_1,S_2}P(S_1,S_2)\log P(S_1,S_2)$, it is possible that when $n$ increase over 6, the joint probability distribution is thinned by added values with very low probability, and this thining effect is stronger than that to edge probability $P(S_1)$ and $P(S_2)$. Then as a result of this `\textit{oversampling}', the joint entropy $H(S_1,S_2)$ decrease more than the summation of two pixel entropies $H(S_1)+H(S_2)$. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/redundancy_vs_n.pdf}
+    \caption{Redundancy vs $n$.}
+    \label{fig:diffferent_n_redundancy} 
+\end{figure}
+
+
+Also, the scaled images by different $n$ values ($n=1,2,3$) are shown in Fig.~\ref{fig:scaled_images_with_different_n}. Here just three $n$ values are shown for illustration purpose, as the images with larger $n$ values are quite similar to the original images. It can be seen that the image scaled with $n=1$ loses most of the details, while the image scaled with $n=3$ already looks quite similar to the original images. So larger $n$ values are preferred for better representation of the images.
+
+\begin{figure}[h]
+    \centering
+    % \includegraphics[width=0.5\textwidth]{figures/prob_L_R.png}\\
+    \includegraphics[width=0.6\textwidth]{figures/images_luminance_n1.png}\\
+    \includegraphics[width=0.6\textwidth]{figures/images_luminance_n2.png}\\
+    \includegraphics[width=0.6\textwidth]{figures/images_luminance_n3.png}\\
+    % \includegraphics[width=0.6\textwidth]{figures/images_luminance_n4.png}\\
+    \caption{Images scaled with different $n$ (from top to bottom: $n=1,2,3$).}
+    \label{fig:scaled_images_with_different_n} 
+\end{figure}
+
+\subsubsection{Correlation matrix $\mathbf{R}^S$}
+
+The correlation matrix of the shifted images is computed as:
+$$
+\mathbf{R}^S \approx 
+\begin{pmatrix}
+    2057.30&1140.37\\
+    1140.37&1990.28\\
+\end{pmatrix}
+$$
+where $\mathbf{R}^S_{ij} = \langle S_i, S_j \rangle$, $i,j=1,2$.
+
+Entities in this matrix refer to \textit{covariance}, instead of correlation coefficient, that's why they are obviously larger than 1.
+
+\subsubsection{Scatter plot of $S_L$ versus $S_R$}
+
+The scatter plot of $S_L$ versus $S_R$ is shown in Fig.~\ref{fig:scatter_plot} (left). It can be seen that there seems to be a positive correlation between the two images, implied by the oval area in the center. There are also some outliers far away from the center area, which may be caused by other special features in the images that are not aligned between two images, make it not so similar to the nice one show in 'Figure 1' of the reference paper.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.4\textwidth]{figures/scatter_LR.pdf}
+    % \caption{Scatter plot of $S_L$ versus $S_R$.}
+    \includegraphics[width=0.4\textwidth]{figures/scatter_LR_with_eigenvectors.pdf}
+    \caption{Scatter plot of $S_L$ versus $S_R$ with eigenvectors. (Left: without eigenvectors; Right: with eigenvectors)}
+    \label{fig:scatter_plot} 
+\end{figure}
+
+
+\subsubsection{Eigenvalues and eigenvectors of $\mathbf{R}^S$}
+
+The eigenvalues and eigenvectors of the correlation matrix $\mathbf{R}^S$ are computed as:
+$$\lambda_1 \approx 3164.65,\ \lambda_2 \approx 882.93$$  
+$$\mathbf{v_1} \approx
+\begin{pmatrix}
+    0.7174\\
+    0.6966\\
+\end{pmatrix}, \mathbf{v_2} \approx
+\begin{pmatrix}
+    -0.6966\\
+    0.7174\\
+\end{pmatrix}$$
+
+The scatter plot with eigenvectors is shown in Fig.~\ref{fig:scatter_plot}(right). It can be seen that the first eigenvector $\mathbf{v_1}$ points to the direction with the largest variance (nearly $\pi/4$), while the second eigenvector $\mathbf{v_2}$ is orthogonal to the first one and points to the direction with the second largest variance (nearly $3\pi/4$). The two eigenvectors is orthogonal to each other, as expected.
+
+
+\subsubsection{The $\mathcal{S}_+$ and $\mathcal{S}_-$ decorrelated from $S_L$ and $S_R$}
+
+The transformed pictures $\mathcal{S}_+$ and $\mathcal{S}_-$ is shown in Fig.~\ref{fig:images_LR_+-}. It can be seen that $\mathcal{S}_+$ performs like an average of the two images, while $\mathcal{S}_-$ looks like the difference between the two images.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/images_LR_+-.pdf}
+    \caption{The $\mathcal{S}_+$ and $\mathcal{S}_-$ images.}
+    \label{fig:images_LR_+-} 
+\end{figure}
+
+The correlation matrix of $\mathcal{S}_+$ and $\mathcal{S}_-$ is computed as:
+$$\mathbf{R}^{\mathcal{S}} \approx
+\begin{pmatrix}
+     3164.16 &  -33.51\\
+    -33.51 & 883.42\\
+\end{pmatrix}
+$$
+
+It can be seen that the off-diagonal terms are much smaller than the diagonal terms, i.e., $R^\mathcal{S}_{+-} = R^\mathcal{S}_{-+} \approx 0$. It means that $\mathcal{S}_+$ and $\mathcal{S}_-$ are nearly uncorrelated. Also, $R^\mathcal{S}_{++} > R^\mathcal{S}_{--}$, which means that the $\mathcal{S}_+$ image has larger variance than the $\mathcal{S}_-$ image, consistent with the eigenvalues computed before.
+
+The scatter plot of $\mathcal{S}_+$ versus $\mathcal{S}_-$ is shown in Fig.~\ref{fig:scatter_plot_+-}. It can be seen that the points are more aligned with the $\mathcal{S}_+$ axis, indicating larger variance along this direction, while the variance along the $\mathcal{S}_-$ axis is smaller. This is consistent with the correlation matrix computed above.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/scatter_+-.pdf}
+    \caption{Scatter plot of $\mathcal{S}_+$ versus $\mathcal{S}_-$.}
+    \label{fig:scatter_plot_+-}
+\end{figure}
+
+\subsubsection{The $\mathcal{O}_+$ and $\mathcal{O}_-$ after gain control}
+
+Here we let the gain values be $g_k=\frac{1}{\sqrt{R^\mathcal{S}_{kk}}}$ ($k=\pm$), which means to whiten the signals to strengthen the weak contrast signals $\mathcal{S}_-$ and suppress the strong contrast signals $\mathcal{S}_+$.
+
+The output images $\mathcal{O}_+$ and $\mathcal{O}_-$ after gain control are shown in Fig.~\ref{fig:images_+-_output}. It can be seen that the $\mathcal{O}_+$ image becomes brighter overall respective to $\mathcal{O}_-$, compared to the $\mathcal{S}_+$ image in Fig.~\ref{fig:images_LR_+-}. This is because the gain control suppresses the signal with larger variance ($\mathcal{S}_+$) and enhances the signal with smaller variance ($\mathcal{S}_-$), to make two images have roughly the same variance. It can also be implied by the correlation matrix $R^\mathcal{O}$ computed below.
+
+$$
+R^{\mathcal{O}} \approx
+\begin{pmatrix}
+    1&-0.02\\
+   -0.02&  1  \\
+\end{pmatrix}
+$$
+
+It shows that the variances of $\mathcal{O}_+$ and $\mathcal{O}_-$ are both normalized to 1, and the off-diagonal terms are close to 0, indicating that they are nearly uncorrelated. The gain control works as \textit{whitening}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/images_Output_+-.pdf}
+    \caption{Output images $O_+$ and $O_-$.}
+    \label{fig:images_+-_output}
+\end{figure}
+
+Also, the scatter plot of $\mathcal{O}_+$ versus $\mathcal{O}_-$ is shown in Fig.~\ref{fig:scatter_plot_output} (Left). It can be seen that the central area is more circularly distributed compared to Fig.~\ref{fig:scatter_plot_+-}, indicating that the variances along both axes are more similar now, consistent with the correlation matrix $R^\mathcal{O}$ computed above.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.4\textwidth]{figures/scatter_output_+-.pdf}
+    \includegraphics[width=0.4\textwidth]{figures/scatter_output_12.pdf}
+    \caption{Scatter plot of $\mathcal{O}_+$ versus $\mathcal{O}_-$ (Left) and $O_1$ versus $O_2$ (Right).}
+    \label{fig:scatter_plot_output}
+\end{figure}
+
+\subsubsection{New images $O_1$, $O_2$ reconstructed from $\mathcal{O}_+$ and $\mathcal{O}_-$}
+
+The new images $O_1$ and $O_2$ reconstructed from $\mathcal{O}_+$ and $\mathcal{O}_-$ are shown in Fig.~\ref{fig:images_12_output}. It can be seen that they look quite similar to the original images shown in Fig.~\ref{fig:photos}, but with some differences in brightness and contrast.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/images_Output_12.pdf}
+    \caption{Output images $O_1$ and $O_2$.}
+    \label{fig:images_12_output}
+\end{figure}
+
+The scatter plot of $O_1$ versus $O_2$ is shown in Fig.~\ref{fig:scatter_plot_output} (Right). From the scatter plot, it is hard to tell whether there is not correlation between the two images, as the points still somehow tend to align along a diagonal direction. Then again, the correlation matrix $R^{O}$ is computed as:
+$$R^{O} \approx
+\begin{pmatrix}
+    0.98 & 0\\
+    0 & 1.02\\
+\end{pmatrix}
+$$
+
+It can be seen that the off-diagonal terms are nearly 0, indicating that $O_1$ and $O_2$ are indeed uncorrelated. Also, the variances of both images are close to 1.
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[width=0.4\textwidth]{figures/scatter_output_12.pdf}
+%     \caption{Scatter plot of $O_1$ versus $O_2$.}
+%     \label{fig:scatter_plot_output_12}
+% \end{figure}
+
+\subsubsection{Add some noise!}
+
+Here random noise with range of $[-N_{max}, N_{max}]$ are added to the ${S}_L$ and ${S}_R$ images, where $N_{max}=\sqrt{(\mathbf R ^S_{11} + \mathbf{R}^S_{22})/2}$. The new images with noise added are shown in Fig.~\ref{fig:images_noise_LR}.
+
+The probability density distributions and joint probability distribution, shown in Fig.~\ref{fig:probability_noise}, shows that the noise makes the distributions more spread out and close to uniform distribution. The correlation matrix of the noisy images is computed as:
+$$
+R^{S'} \approx\begin{pmatrix}
+    878.15  &   259.95 \\
+    259.95  &   969.37 \\
+\end{pmatrix}
+$$
+
+The scatter plot of noisy images $S_L$ versus $S_R$ with eigenvectors is shown in Fig.~\ref{fig:scatter_noise_LR}. It can be seen that the points are also more spread out due to the noise. The eigenvectors are also plotted, which are similar to those computed before in direction, but the values decrease a bit due to the noise. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/images_noise_LR.pdf}
+    \caption{Noisy images $S'_L$ and $S'_R$.}
+    \label{fig:images_noise_LR}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{figures/prob_noise_LR.pdf}
+    \includegraphics[width=0.45\textwidth]{figures/joint_prob_noise_LR.pdf}
+    \caption{Probability density and joint probability distributions of noisy images $S_L$ and $S_R$.}
+    \label{fig:probability_noise}
+\end{figure}
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[width=0.7\textwidth]{figures/joint_prob_noise_LR.pdf}
+%     \caption{Joint probability distribution of noisy images $S_L$ and $S_R$.}
+%     \label{fig:joint_probability_noise}
+% \end{figure}
+
+\begin{figure}[h]
+    \centering
+    % \includegraphics[width=0.45\textwidth]{figures/scatter_noise_LR.pdf}
+    \includegraphics[width=0.45\textwidth]{figures/scatter_noise_LR_with_eigenvectors.pdf}
+    \caption{Scatter plot and eigenvectors of noisy images $S'_L$ and $S'_R$.}
+    \label{fig:scatter_noise_LR}
+\end{figure}
+
+Then get the $\mathcal{S}'_+$ and $\mathcal{S}'_-$ images and the scatter plot, shown in Fig.~\ref{fig:images_noise_+-} and Fig.~\ref{fig:scatter_noise_+-}(left) respectively. The correlation matrix of $\mathcal{S}'_+$ and $\mathcal{S}'_-$ is computed as below. The off-diagonal terms are still small compared to the diagonal terms, indicating that $\mathcal{S}'_+$ and $\mathcal{S}'_-$ are still nearly uncorrelated. However, the variances of both images decrease due to the noise.
+$$
+R^{\mathcal{S}'} \approx\begin{pmatrix}
+    1183.71 & 45.61 \\
+    45.61 & 663.81 \\
+\end{pmatrix}
+$$
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/images_noise_+-.pdf}
+    \caption{Noisy images $\mathcal{S}'_+$ and $\mathcal{S}'_-$.}
+    \label{fig:images_noise_+-}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{figures/scatter_noise_+-.pdf}
+    \includegraphics[width=0.35\textwidth]{figures/scatter_output_noise_+-.pdf}
+    \caption{Scatter plot of noisy images $\mathcal{S}_+$ and $\mathcal{S}_-$, also $\mathcal{O}'_+$ and $\mathcal{O}'_-$.}
+    \label{fig:scatter_noise_+-}
+\end{figure}
+
+Apply the same gain control to get $\mathcal{O}'_+$ and $\mathcal{O}'_-$ images, shown in Fig.~\ref{fig:images_output_noise_+-}. The scatter plot is also shown in Fig.~\ref{fig:scatter_noise_+-}(right). The correlation matrix of $\mathcal{O}'_+$ and $\mathcal{O}'_-$ is computed as:
+$$
+R^{\mathcal{O}'} \approx\begin{pmatrix}
+    1 & 0.05 \\
+    0.05 & 1 \\
+\end{pmatrix}
+$$
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[width=0.5\textwidth]{figures/scatter_output_noise_+-.pdf}
+%     \caption{Scatter plot of noisy images $\mathcal{O}'_+$ and $\mathcal{O}'_-$.}
+%     \label{fig:scatter_output_noise_+-}
+% \end{figure}
+
+Then reconstruct the noisy images $O'_1$ and $O'_2$, shown in Fig.~\ref{fig:images_output_noise_12}. The correlation matrix of $O'_1$ and $O'_2$ is computed as below. The off-diagonal terms are zero and the variances of both images are close to 1, similar to the $R^{\mathcal{O}'}$
+$$
+R^{O'} \approx\begin{pmatrix}
+    1.05 & 0 \\
+    0 & 0.95\\
+\end{pmatrix}
+$$
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/images_Output_noise_+-.pdf}
+    \caption{Noisy images $\mathcal{O}'_+$ and $\mathcal{O}'_-$ .}
+    \label{fig:images_output_noise_+-}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/images_Output_noise_12.pdf}
+    \caption{Noisy images $O'_1$ and $O'_2$.}
+    \label{fig:images_output_noise_12}
+\end{figure}
+
+
+The result so far is quite similar to the noise-free case. The the noise affects the variances of the intermediate images $\mathcal{S}'_+$ and $\mathcal{S}'_-$, but the final output images $O'_1$ and $O'_2$ are still uncorrelated with variances close to 1 after gain control and reconstruction. As shown below, the off-diagonal terms of the correlation matrix of the new noisy images are nearly 0 already, which indicates that images with larger noise amplitude are more incorrelated. 
+
+Noise with larger amplitude was also tested, the noisy images and the scatter plot are shown in Fig.~\ref{fig:images_output_larger_noise_LR} and Fig.~\ref{fig:scatter_output_larger_noise_LR} respectively. It can be seen that with larger amplitude, the scatter plot becomes more circular and the eigenvectors can seldomly indicate the correlation between the two images, such as the feature of 'smoothing' and 'contrast'. The correlation matrix shown below also indicates that the two images are nearly uncorrelated now, as the off-diagonal terms are close to zero compared to the diagonal terms.
+$$
+R^{S''} \approx\begin{pmatrix}
+    1058.44 & 3.00 \\
+    3.00 & 896.76 \\
+\end{pmatrix}
+$$
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/images_larger_noise_LR.pdf}
+    \caption{Noisy images $S'_L$ and $S'_R$ with larger amplitude.}
+    \label{fig:images_output_larger_noise_LR}
+\end{figure}
+
+% Also, after the process we have done before, with the same gain control and reconstruction, the correlation matrix of the final output is still diagonal:
+
+% $$
+% R^{O''} \approx\begin{pmatrix}
+%     0.9173 & 0 \\
+%     0 & 1.0827\\
+% \end{pmatrix}
+% $$
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/scatter_larger_noise_LR_with_eigenvectors.pdf}
+    \caption{Scatter plot of noisy images $S'_L$ and $S'_R$ with larger amplitude.}
+    \label{fig:scatter_output_larger_noise_LR}
+\end{figure}
+
+
+\clearpage
+\subsection{Part 2: Efficient spatial coding}
+
+\subsubsection{Choose a natural picture}
+
+The natural image and its gray-scaled luminance are shown in Fig.~\ref{fig:natural_image}.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.35\textwidth]{figures-2/p5.jpg}
+    \includegraphics[width=0.35\textwidth]{figures-2/p5-luminance.jpg}
+    \caption{Natural image and its luminance version. (Left: original image; Right: luminance image)}
+    \label{fig:natural_image}
+\end{figure}
+
+\subsubsection{Zero-mean and approximate spatial correlation}
+
+Normalize the luminance image to make if zero mean, and then compute the spatial correlation matrix $\mathbf{R}^S(d)$ as a function of pixels distance $d$, shown in Fig.~\ref{fig:spatial_correlation_vs_distance} (left). Also, here tried considering the image to be 'periodic', i.e., horizontally mirror the image and consider the pixel at the right edge is neighboring the pixel at the left edge, to keep the same number of pixel pairs for all distances. The result is shown in Fig.~\ref{fig:spatial_correlation_vs_distance} (right).
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{figures-2/spatial_correlation_vs_distance.pdf}
+    \includegraphics[width=0.45\textwidth]{figures-2/spatial_correlation_vs_distance_prime.pdf}
+    \caption{Spatial correlation as a function of pixel distance $d$. (Left: non-periodic; Right: periodic)}
+    \label{fig:spatial_correlation_vs_distance}
+\end{figure}
+
+It can be seen that, as distance $d$ of pixels increase, the approximate spatial correlation $R^S(d)$ decays rapidly, exhibiting an roughly exponential decline on a logarithmic scale. For some $d$ there are even negative correltion, which might due to the limited data sample of the image and the specific features in this image. It indicates that pixels far away from each other tend to be less correlated, which is reasonable as the features in natural images are usually locally continuous. From the aspects of efficient coding, it means that pixels close to each other contain more redundant information, thus can be compressed with fewer bits more effectively.
+
+
+\subsubsection{2-D Fourier transform }
+
+Use `numpy.fft.fft2' to compute the 2-D Fourier transform of the zero-mean luminance image, plot the frequency spectrum in Fig.~\ref{fig:frequency_spectrum and power_vs_k} (Top), and then compute the power spectrum as the squared norm of the Fourier coefficients $k=\sqrt{k_x^2+k_y^2}$, shown in Fig.~\ref{fig:frequency_spectrum and power_vs_k} (Bottom).
+
+It can be seen that the frequency spectrum shows obviously large value near the zero frequency axes, which indicates the low frequency hold larger power in the image, and the power decreases with frequency $k$ roughly as $\sim |1/k|^2$.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures-2/frequency_spectrum.pdf}
+    \includegraphics[width=0.5\textwidth]{figures-2/power_vs_k.pdf}
+    \caption{Top: Fourier transform frequency spectrum $\mathcal{S}(k)$ of signal $S(k)$, visualized as $\log|\mathcal{S}(k)|$. Bottom: Power $|\mathcal{S}(k)|^2$ as a function of spatial frequency $k$. (Red line: $\sim |1/k|^2$, Green line: the average power for each $|k|$)}
+    \label{fig:frequency_spectrum and power_vs_k}
+\end{figure}
+
+\subsubsection{Fourier transform with noise}
+
+Here random noise with range of $[-N_{max}, N_{max}]$ are added to the zero-mean luminance image, where $N_{max}=100$ is set. The noisy image is shown in Fig.~\ref{fig:noisy_image}.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.35\textwidth]{figures-2/Noisy_image.pdf}
+    \caption{Noisy luminance image.}
+    \label{fig:noisy_image}
+\end{figure}
+
+The frequency spectrum and power spectrum are shown in Fig.~\ref{fig:frequency_spectrum and power_vs_k with noise}. It can be seen that with random noise, the frequency spectrum show clear `x' pattern along the zero frequency axes as before, and the power at high frequency $k$ doesn't decrease along $1/k^2$ as expected, but tends to a constant value, which is aligned with the pattern shown in Figure 4B in the instruction. It may because the random noise contains all frequency components equally.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{figures-2/frequency_spectrum_noisy.pdf}
+    \includegraphics[width=0.45\textwidth]{figures-2/power_vs_k_noisy.pdf}
+    \caption{Fourier transform frequency spectrum $\mathcal{S}(k)$ (Left) and power spectrum (Right) of noisy luminance image.}
+    \label{fig:frequency_spectrum and power_vs_k with noise}
+\end{figure}
+
+\subsubsection{Gain control}
+
+Apply gain control to the Fourier components $\mathcal{S}(k)$ with gain values $g(k) = (|k|+|k_o|)\cdot\exp(-|k|^2/k^2_{low})$ to get the output $\mathcal{O}(k)$, setting $k_o = 10^{-8}$ and $k_{low} = 0.15$. $k_{low} = 0.15$ is selected due to the observation in Fig.~\ref{fig:frequency_spectrum and power_vs_k with noise} (Right), where the power spectrum starts to deviate from the $\sim 1/k^2$ line around this value. It is also the \textit{optimal} gain where the signal and noise power are comparable. The gain versus frequency $k$ under the optimal gain is shown in Fig.~\ref{fig:opt_gain_vs_k} (left), and the gain matrix versus $k_x$ and $k_y$ is shown in Fig.~\ref{fig:opt_gain_vs_k} (right).
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{figures-2/opt_gain_vs_k.pdf}
+    \includegraphics[width=0.45\textwidth]{figures-2/gain_matrix_heatmap.pdf}
+    \caption{The optimal gain $g(k)$ versus frequency $k$ (Left), and versus $k_x$ and $k_y$ (Right)}
+    \label{fig:opt_gain_vs_k}
+\end{figure}
+
+Then do the inverse Fourier transform to $\mathcal{O}(k)$ to get the output image $O(x,y)$ under optimal gain control. In addition, two output images with `higher-pass' ($k_{low} = 1$) and `lower-pass' ($k_{low} = 0.03$) gain control are also computed for comparison. The three output images are shown in Fig.~\ref{fig:output_image_after_gain_control}. The results are similar to Figure 4CDE in the instruction, where the optimal gain control output image shows enhanced edges and details, the higher-pass gain control output image shows very sharp edges but lost most of the other details, while the lower-pass gain control smooth the signal but blurs the edges.
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.4\textwidth]{figures-2/output_image_optimal_gain_control.pdf}\\
+    \includegraphics[width=0.4\textwidth]{figures-2/output_image_higher-pass_gain_control.pdf}
+    \includegraphics[width=0.4\textwidth]{figures-2/output_image_lower-pass_gain_control.pdf}
+    \caption{Output images after gain control. (Top: optimal gain control; Bottom left: higher-pass gain control; Bottom right: lower-pass gain control)}
+    \label{fig:output_image_after_gain_control}
+\end{figure}
+
+\clearpage
+\subsubsection{Spatial receptive field from $g(k)$}
+
+Here study the spatial receptive field corresponding to the gain $g(k)$, by doing the inverse Fourier transform of $g(k)$. The receptive field under optimal gain $k_{low}=0.15$ is shown in Fig.~\ref{fig:RF_opt_gain}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures-2/receptive_field_gain_matrix_k_low_0.15.pdf}
+    \caption{Spatial receptive field corresponding to the optimal gain $g(k)$.}
+    \label{fig:RF_opt_gain}
+\end{figure}
+
+If we change $k_{low}$ to be smaller value and make gain to be lower-pass filter, e.g. $k_{low}=0.02,0.01,0.005$, as shown in Fig.~\ref{fig:RF_lower-pass_gain}, the receptive field spread out with lower the peak and weakened negative-surround (according to the colorbars). 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.32\textwidth]{figures-2/receptive_field_gain_matrix_k_low_0.02.pdf}
+    \includegraphics[width=0.32\textwidth]{figures-2/receptive_field_gain_matrix_k_low_0.01.pdf}
+    \includegraphics[width=0.32\textwidth]{figures-2/receptive_field_gain_matrix_k_low_0.005.pdf}
+    \caption{Spatial receptive fields corresponding to lower-pass gain $g(k)$ with $k_{low}=0.02$ (Left), $k_{low}=0.01$ (Middle), and $k_{low}=0.005$ (Right).}
+    \label{fig:RF_lower-pass_gain}
+\end{figure}
+
+As the image become noisier, the Signal-to-Noise rate decrease, then the $k_{low}$ where the signal and noise are comparable become smaller. Thus the gain control tends to be more like a lower-pass filter, to collect worthful low-frequency information and suppress high-frequency noise. Correspondingly, lower frequency would lead to more spread-out spatial receptive field with weakened negative-surround, to collect information from larger spatial area.
+
+
+\end{document}
