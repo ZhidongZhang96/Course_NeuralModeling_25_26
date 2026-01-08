@@ -2,3 +2,4 @@
 .DS_Store
 *.synctex.gz
 *.aux
+.idea/
