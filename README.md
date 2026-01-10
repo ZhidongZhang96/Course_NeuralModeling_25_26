@@ -4,7 +4,7 @@ Vision
 ---
 It was taught by Prof. Zhaoping Li. 
 
-Exercise was done by **Zhidong Zhang** individually.
+Exercise was done by **[Zhidong Zhang](https://github.com/ZhidongZhang96)** individually.
 
 Resources:
 - Reference book: "Understanding Vision: theory, models, and data" by Zhaoping Li.
@@ -14,4 +14,4 @@ Motor (Control, Adaptation and Learning)
 ---
 It was taught by Prof. Winfried Ilg and Ostertag Magnus.
 
-Exercise was done by **Yuzhe Han** and **Zhidong Zhang**.
+Exercise was done by **[Yuzhe Han](https://github.com/Hzzz12138)** and **[Zhidong Zhang](https://github.com/ZhidongZhang96)**.
