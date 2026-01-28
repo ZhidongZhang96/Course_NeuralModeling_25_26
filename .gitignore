@@ -3,3 +3,4 @@
 *.synctex.gz
 *.aux
 .idea/
+__pycache__/

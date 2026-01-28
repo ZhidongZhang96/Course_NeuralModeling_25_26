@@ -1,0 +1,13 @@
+feedback_type,block_id,n_trials,hit_rate,mean_score_delta
+,1,1,0.000,0.00
+,2,1,0.000,-50.00
+,3,1,0.000,-32.00
+trajectory,4,1,1.000,74.00
+trajectory,5,1,0.000,0.00
+trajectory,6,1,0.000,0.00
+endpos,7,2,0.000,-25.00
+endpos,8,2,0.000,0.00
+endpos,9,2,0.500,45.00
+rl,10,2,0.000,-25.00
+rl,11,2,0.500,36.50
+rl,12,2,0.000,0.00
