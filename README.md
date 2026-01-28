@@ -2,9 +2,9 @@ Exercise for **'Neural Modeling 2025-2026'** in GTC, Tuebingen, which contains t
 
 Vision
 ---
-It was taught by Prof. Zhaoping Li. 
+It was taught by **Prof. Zhaoping Li**. 
 
-Exercise was done by **[Zhidong Zhang](https://github.com/ZhidongZhang96)** individually.
+Exercise was done by **[@Zhidong Zhang](https://github.com/ZhidongZhang96)** individually.
 
 Resources:
 - Reference book: "Understanding Vision: theory, models, and data" by Zhaoping Li.
@@ -12,6 +12,6 @@ Resources:
 
 Motor (Control, Adaptation and Learning)
 ---
-It was taught by Prof. Winfried Ilg and Ostertag Magnus.
+It was taught by **Prof. Winfried Ilg** and **Ostertag Magnus**.
 
-Exercise was done by **[Yuzhe Han](https://github.com/Hzzz12138)** and **[Zhidong Zhang](https://github.com/ZhidongZhang96)**.
+Exercise was done by **[@Yuzhe Han](https://github.com/Hzzz12138)** and **[@Zhidong Zhang](https://github.com/ZhidongZhang96)**.
